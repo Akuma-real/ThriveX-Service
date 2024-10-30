@@ -21,7 +21,7 @@ COPY blog/target/*.jar /app/app.jar
 
 # 复制配置文件
 COPY blog/src/main/resources/application.yml /app/application.yml
-COPY blog/src/main/resources/templates/application-pro.yml /app/application-prod.yml
+COPY blog/src/main/resources/application-env.yml /app/application-prod.yml
 
 # 安装 envsubst
 RUN apt-get update && apt-get install -y gettext-base
