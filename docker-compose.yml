@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  service:
+    image: ghcr.io/akuma-real/thrivex-service:main
+    container_name: thrivex-service
+    restart: always
+    ports:
+      - "9003:9003"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - MYSQL_URL=jdbc:mysql://mysql:3306/thrivex?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
+      - MYSQL_USERNAME=${MYSQL_USERNAME}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - QINIU_ACCESS_KEY=${QINIU_ACCESS_KEY}
+      - QINIU_SECRET_KEY=${QINIU_SECRET_KEY}
+      - QINIU_BUCKET=${QINIU_BUCKET}
+      - MAIL_HOST=${MAIL_HOST}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+    depends_on:
+      - mysql
+    networks:
+      - thrivex-network
+
+  mysql:
+    image: mysql:8.0
+    container_name: thrivex-mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=thrivex
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3306:3306"
+    networks:
+      - thrivex-network
+
+volumes:
+  mysql_data:
+
+networks:
+  thrivex-network:
+    name: thrivex-network
+    driver: bridge

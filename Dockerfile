@@ -1,14 +1,33 @@
-# 设置基础镜像
+# 构建阶段
+FROM maven:3.8.4-openjdk-11-slim as builder
+
+# 设置工作目录
+WORKDIR /app
+
+# 复制源代码
+COPY . .
+
+# 构建项目
+RUN mvn clean package -DskipTests
+
+# 生产阶段
 FROM openjdk:11.0-jre-buster
 
 # 设置工作目录
-WORKDIR /thrive
+WORKDIR /app
 
-# 将jar包复制到工作目录中并拷贝给app.jar
-COPY thrive.jar /thrive/app.jar
+# 从构建阶段复制 jar 包
+COPY --from=builder /app/blog/target/*.jar /app/app.jar
 
-# 暴露容器端口号，不写表示所有
+# 添加环境变量替换脚本
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
+# 暴露端口
 EXPOSE 9003
 
-# 创建容器成功做的事情,等价于：java -jar app.jar
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# 使用环境变量替换脚本作为入口
+ENTRYPOINT ["/docker-entrypoint.sh"]
+
+# 启动命令
+CMD ["java", "-jar", "app.jar"]
