@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   service:
-    image: ghcr.io/akuma-real/thrivex-service:main
+    image: ghcr.io/akuma-real/thrivex-service:master
     container_name: thrivex-service
     restart: always
     ports:

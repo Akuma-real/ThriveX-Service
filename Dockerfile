@@ -16,8 +16,15 @@ FROM openjdk:11.0-jre-buster
 # 设置工作目录
 WORKDIR /app
 
-# 从构建阶段复制 jar 包
-COPY --from=builder /app/blog/target/*.jar /app/app.jar
+# 复制 jar 包
+COPY blog/target/*.jar /app/app.jar
+
+# 复制配置文件
+COPY blog/src/main/resources/application.yml /app/application.yml
+COPY blog/src/main/resources/application-prod.yml /app/application-prod.yml
+
+# 安装 envsubst
+RUN apt-get update && apt-get install -y gettext-base
 
 # 添加环境变量替换脚本
 COPY docker-entrypoint.sh /docker-entrypoint.sh
